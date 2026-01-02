@@ -2,10 +2,12 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const multiplierText = document.getElementById("multiplier");
 
-// Load plane image
+// Base64 red plane image (small top-view icon)
 const planeImg = new Image();
-planeImg.src = "plane.png";  // replace with your plane image path
+planeImg.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAACXBIWXMAAAsTAAALEwEAmpwYAAA..."; 
+// (this is a placeholder, I can give a full small red plane PNG base64)
 
+// Resize canvas
 function resize() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight * 0.6;
@@ -24,7 +26,7 @@ function generateCrash() {
   return Math.random() * 8 + 1.5;
 }
 
-/* 💨 SMOKE PARTICLES */
+/* SMOKE PARTICLES */
 function addSmoke(x, y) {
   smoke.push({ x: x - 18, y, alpha: 0.6, size: 4 });
 }
@@ -43,7 +45,7 @@ function drawSmoke() {
   smoke = smoke.filter(p => p.alpha > 0);
 }
 
-/* ➰ CURVE TRAIL */
+/* CURVE TRAIL */
 function drawCurve(x, y) {
   ctx.strokeStyle = "rgba(255,45,45,0.6)";
   ctx.lineWidth = 4;
@@ -57,13 +59,13 @@ function drawCurve(x, y) {
   ctx.shadowBlur = 0;
 }
 
-/* 💥 CRASH EFFECT */
+/* CRASH EFFECT */
 function crashFlash() {
   ctx.fillStyle = "rgba(255,45,45,0.35)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-/* 🔁 RESET */
+/* RESET */
 function resetGame() {
   startTime = null;
   multiplier = 1;
@@ -72,7 +74,7 @@ function resetGame() {
   crashPoint = generateCrash();
 }
 
-/* ✈️ DRAW PLANE IMAGE */
+/* DRAW PLANE IMAGE */
 function drawPlane(x, y, tilt) {
   const planeWidth = 40;
   const planeHeight = 40;
@@ -83,7 +85,7 @@ function drawPlane(x, y, tilt) {
   ctx.restore();
 }
 
-/* 🔄 ANIMATION LOOP */
+/* ANIMATION LOOP */
 function animate(timestamp) {
   if (!startTime) startTime = timestamp;
   const t = (timestamp - startTime) / 1000;
@@ -96,13 +98,13 @@ function animate(timestamp) {
 
     const x = 90 + t * 100;
     const y = canvas.height - t * 70;
-    const tilt = -Math.PI / 12; // slight tilt
+    const tilt = -Math.PI / 12;
 
     drawCurve(x, y);
     addSmoke(x, y);
     drawSmoke();
 
-    if (planeImg.complete) drawPlane(x, y, tilt); // draw image when loaded
+    if (planeImg.complete) drawPlane(x, y, tilt);
 
     if (multiplier >= crashPoint) {
       crashed = true;
@@ -114,6 +116,7 @@ function animate(timestamp) {
   requestAnimationFrame(animate);
 }
 
+// Start animation after plane loads
 planeImg.onload = () => {
   requestAnimationFrame(animate);
 };
