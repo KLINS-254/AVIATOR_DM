@@ -9,64 +9,103 @@ function resize() {
 resize();
 window.addEventListener("resize", resize);
 
-let startTime;
-let multiplier = 1.0;
+let startTime = null;
 let crashed = false;
+let multiplier = 1.0;
 
-// crash point (hidden)
-const crashPoint = (Math.random() * 8 + 1.5).toFixed(2);
+let crashPoint = generateCrash();
 
-function drawPlane(x, y) {
-  ctx.fillStyle = "red";
-  ctx.beginPath();
-  ctx.moveTo(x, y);
-  ctx.lineTo(x - 30, y + 15);
-  ctx.lineTo(x - 30, y - 15);
-  ctx.closePath();
-  ctx.fill();
+function generateCrash() {
+  return Math.random() * 8 + 1.5;
 }
 
-function animate(timestamp) {
-  if (!startTime) startTime = timestamp;
-  const elapsed = (timestamp - startTime) / 1000;
+/* ✈️ DRAW RED PLANE */
+function drawPlane(x, y) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-Math.PI / 7);
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#ff2d2d";
+  ctx.beginPath();
 
-  if (!crashed) {
-    multiplier = Math.exp(elapsed / 6);
-    multiplierText.textContent = multiplier.toFixed(2) + "x";
+  // Nose
+  ctx.moveTo(18, 0);
 
-    const x = 100 + elapsed * 90;
-    const y = canvas.height - elapsed * 60;
+  // Top wing
+  ctx.lineTo(-6, -4);
+  ctx.lineTo(-10, -10);
 
-    // curve
-    ctx.strokeStyle = "rgba(255,0,0,0.4)";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height);
-    ctx.quadraticCurveTo(
-      canvas.width / 3,
-      canvas.height - y / 2,
-      x,
-      y
-    );
-    ctx.stroke();
+  // Tail
+  ctx.lineTo(-12, -4);
+  ctx.lineTo(-18, 0);
+  ctx.lineTo(-12, 4);
 
-    drawPlane(x, y);
+  // Bottom wing
+  ctx.lineTo(-10, 10);
+  ctx.lineTo(-6, 4);
 
-    if (multiplier >= crashPoint) {
-      crashed = true;
-      setTimeout(resetGame, 1500);
-    }
-  }
+  ctx.closePath();
+  ctx.fill();
 
-  requestAnimationFrame(animate);
+  ctx.restore();
+}
+
+/* CURVED TRAIL */
+function drawCurve(x, y) {
+  ctx.strokeStyle = "rgba(255,45,45,0.6)";
+  ctx.lineWidth = 4;
+  ctx.shadowColor = "#ff2d2d";
+  ctx.shadowBlur = 12;
+
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height);
+  ctx.quadraticCurveTo(
+    canvas.width * 0.35,
+    canvas.height - y * 0.35,
+    x,
+    y
+  );
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+}
+
+/* CRASH FLASH */
+function crashFlash() {
+  ctx.fillStyle = "rgba(255,45,45,0.25)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function resetGame() {
   startTime = null;
   multiplier = 1.0;
   crashed = false;
+  crashPoint = generateCrash();
+}
+
+function animate(timestamp) {
+  if (!startTime) startTime = timestamp;
+  const t = (timestamp - startTime) / 1000;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!crashed) {
+    multiplier = Math.exp(t / 6);
+    multiplierText.textContent = multiplier.toFixed(2) + "x";
+
+    const x = 90 + t * 100;
+    const y = canvas.height - t * 70;
+
+    drawCurve(x, y);
+    drawPlane(x, y);
+
+    if (multiplier >= crashPoint) {
+      crashed = true;
+      crashFlash();
+      setTimeout(resetGame, 1500);
+    }
+  }
+
+  requestAnimationFrame(animate);
 }
 
 requestAnimationFrame(animate);
