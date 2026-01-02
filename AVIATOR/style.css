@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #0b0f14;
+  color: white;
+  overflow: hidden;
+}
+
+.header {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: #ff2d2d;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.mode {
+  background: #c58b1b;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+canvas {
+  display: block;
+  width: 100vw;
+  height: 60vh;
+}
+
+.multiplier {
+  position: absolute;
+  top: 35%;
+  width: 100%;
+  text-align: center;
+  font-size: 64px;
+  font-weight: bold;
+  text-shadow: 0 0 20px rgba(255,0,0,0.5);
+}
